@@ -50,7 +50,7 @@ namespace Arcanoid
 
             DoMove(goingLeft);
         }
-
+        //Movement method
         private void DoMove(bool? goingLeft)
         {
             if (goingLeft.HasValue)
