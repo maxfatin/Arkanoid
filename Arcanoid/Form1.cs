@@ -61,6 +61,7 @@ namespace Arcanoid
                     movementSpeed *= -1;
                 }
                 Paddle.Location = new Point(Paddle.Location.X + movementSpeed, Paddle.Location.Y);
+                Ball.Location = new Point(Ball.Location.X + movementSpeed, Ball.Location.Y);
             }
         }
         //Check if keys are pressed
