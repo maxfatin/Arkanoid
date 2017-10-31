@@ -12,6 +12,8 @@ namespace Arcanoid
 {
     public partial class Board1 : Form
     {
+        public const int topSide = 0, leftSide = 0, rightSide = 995;
+        public int xSpeed = 1, ySpeed = 3;
         const int speed = 3;
         bool isLeftPressed, isRightPressed, isSpacePressed = false;
 
@@ -33,6 +35,7 @@ namespace Arcanoid
         private void timer_Tick(object sender, EventArgs e)
         {
             bool? goingLeft = null;
+            var ballSpeed = speed;
             if (isLeftPressed)
             {
                 goingLeft = true;
@@ -47,21 +50,38 @@ namespace Arcanoid
                 else
                     goingLeft = false;
             }
+            if (isSpacePressed == true)
+            {
+                Ball.Location = new Point(Ball.Location.X + xSpeed, Ball.Location.Y - ySpeed);
 
+            }
+            //else
+            //{
+            //    if (Paddle.Location.X != leftSide)
+            //    {
+            //        Ball.Location = new Point(Ball.Location.X + speed, Ball.Location.Y);
+            //    }
+            //}
             DoMove(goingLeft);
         }
-        //Movement method
+        //!!!!!!!!!!!!!!!!!!Movement method
         private void DoMove(bool? goingLeft)
         {
             if (goingLeft.HasValue)
             {
                 var movementSpeed = speed;
+
                 if (goingLeft.Value)
                 {
                     movementSpeed *= -1;
                 }
-                Paddle.Location = new Point(Paddle.Location.X + movementSpeed, Paddle.Location.Y);
-                Ball.Location = new Point(Ball.Location.X + movementSpeed, Ball.Location.Y);
+                Paddle.Location = new Point(Math.Max(leftSide, Math.Min(rightSide, Paddle.Location.X + movementSpeed)), Paddle.Location.Y);
+                
+                    //if ()
+                    //{
+                    //    Ball.Location = new Point(Ball.Location.X + movementSpeed, Ball.Location.Y);
+
+                    //}
             }
         }
         //Check if keys are pressed
