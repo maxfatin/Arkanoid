@@ -63,7 +63,7 @@ namespace Arcanoid
                 Paddle.Location = new Point(Paddle.Location.X + movementSpeed, Paddle.Location.Y);
             }
         }
-
+        //Check if keys are pressed
         private void CheckKeys(KeyEventArgs e, bool isDown)
         {
             switch (e.KeyCode)
