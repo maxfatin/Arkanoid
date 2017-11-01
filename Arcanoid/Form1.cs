@@ -12,10 +12,14 @@ namespace Arcanoid
 {
     public partial class Board1 : Form
     {
-        public const int topSide = 0, leftSide = 0, rightSide = 995;
+        public const int topSide = 0, leftSide = 0, rightSide = 1025, bottomSide = 630;
         public int xSpeed = 1, ySpeed = 3;
         const int speed = 3;
         bool isLeftPressed, isRightPressed, isSpacePressed = false;
+        bool? wasGoingLeft;
+        int numOfTicks;
+        int numOfPaddleHits = 1;
+        Random rand = new Random();
 
         public Board1()
         {
@@ -27,6 +31,11 @@ namespace Arcanoid
 
         }
 
+        private void pictureBox12_Layout(object sender, LayoutEventArgs e)
+        {
+            
+        }
+
         private void pictureBox13_Click(object sender, EventArgs e)
         {
 
@@ -35,7 +44,6 @@ namespace Arcanoid
         private void timer_Tick(object sender, EventArgs e)
         {
             bool? goingLeft = null;
-            var ballSpeed = speed;
             if (isLeftPressed)
             {
                 goingLeft = true;
@@ -52,38 +60,102 @@ namespace Arcanoid
             }
             if (isSpacePressed == true)
             {
-                Ball.Location = new Point(Ball.Location.X + xSpeed, Ball.Location.Y - ySpeed);
-
+                if (Ball.Location.X <= leftSide || Ball.Location.X >= (rightSide + Paddle.Width - 30))
+                {
+                    xSpeed *= -1;
+                }
+                if (Ball.Location.Y <= topSide)
+                {
+                    ySpeed *= -1;
+                }
+                Ball.Location = new Point(Math.Max(leftSide, Math.Min((rightSide + Paddle.Width - 30), Ball.Location.X + xSpeed)), Math.Max(topSide, Ball.Location.Y - ySpeed));
             }
-            //else
-            //{
-            //    if (Paddle.Location.X != leftSide)
-            //    {
-            //        Ball.Location = new Point(Ball.Location.X + speed, Ball.Location.Y);
-            //    }
-            //}
-            DoMove(goingLeft);
+            else
+            {
+                if (goingLeft.HasValue)
+                    {
+                        var ballSpeed = speed*numOfTicks/7;
+                        if (goingLeft.Value)
+                        {
+                            ballSpeed *= -1;
+                        }
+                        Ball.Location = new Point(Math.Max(leftSide, Math.Min((rightSide+ Paddle.Width - 30), Ball.Location.X)) + ballSpeed, Ball.Location.Y);
+                    }
+            }
+            DoMove(goingLeft, ref wasGoingLeft, ref numOfTicks);
+            if (Ball.Location.Y >= bottomSide)
+            {
+                Paddle.Location = new Point(535, 628);
+                Ball.Location = new Point(600, 604);
+                isSpacePressed = false;
+                ySpeed *= -1;
+                xSpeed = rand.Next(-3, 3);
+            }
+
+            if (Paddle.Bounds.IntersectsWith(Ball.Bounds))
+            {
+                numOfPaddleHits++;
+                if (numOfPaddleHits % 3 == 0)
+                    ySpeed--;
+                
+                ySpeed *= -1;
+                if (wasGoingLeft == true && numOfTicks >=5 && xSpeed >= -7)
+                {
+                    xSpeed--;
+                }
+                else if (wasGoingLeft == false && numOfTicks >=5 && xSpeed <= 7)
+                {
+                    xSpeed++;
+                }
+            }
+            if (Ball.Bounds.IntersectsWith(pictureBox12.Bounds)|| Ball.Bounds.IntersectsWith(pictureBox10.Bounds))
+            {
+                ySpeed *= -1;
+                pictureBox12.Hide();
+            }
+
         }
-        //!!!!!!!!!!!!!!!!!!Movement method
-        private void DoMove(bool? goingLeft)
+        private void DoMove(bool? goingLeft, ref bool? wasGoingLeft, ref int numOfTicks)
         {
             if (goingLeft.HasValue)
             {
-                var movementSpeed = speed;
+                var movementSpeed = speed * numOfTicks/7;
 
                 if (goingLeft.Value)
                 {
                     movementSpeed *= -1;
                 }
                 Paddle.Location = new Point(Math.Max(leftSide, Math.Min(rightSide, Paddle.Location.X + movementSpeed)), Paddle.Location.Y);
-                
-                    //if ()
-                    //{
-                    //    Ball.Location = new Point(Ball.Location.X + movementSpeed, Ball.Location.Y);
+            }
 
-                    //}
+            if (wasGoingLeft.HasValue)
+            {
+                if(!goingLeft.HasValue)
+                {
+                    wasGoingLeft = null;
+                    numOfTicks = 0;
+                }
+                else if (wasGoingLeft.Value == goingLeft.Value)
+                {
+                    numOfTicks++;
+                }
+                else
+                {
+                    wasGoingLeft = goingLeft;
+                    numOfTicks = 1;
+                }
+            }
+            else if (goingLeft.HasValue)
+            {
+                wasGoingLeft = goingLeft;
+                numOfTicks = 1;
             }
         }
+        
+        
+        
+        
+        
         //Check if keys are pressed
         private void CheckKeys(KeyEventArgs e, bool isDown)
         {
