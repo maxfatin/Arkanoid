@@ -111,7 +111,7 @@ namespace Arcanoid
             if (Ball.Bounds.IntersectsWith(pictureBox12.Bounds)|| Ball.Bounds.IntersectsWith(pictureBox10.Bounds))
             {
                 ySpeed *= -1;
-                pictureBox12.Hide();
+                pictureBox12.Enabled = false;
             }
 
         }
